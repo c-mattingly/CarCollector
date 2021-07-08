@@ -9,7 +9,7 @@ from django.views.generic import ListView, DetailView
 
 class CarCreate(CreateView):
     model = Car
-    fields = '__all__'
+    fields = ['year', 'make', 'model', 'comment']
 
 class CarUpdate(UpdateView):
     model = Car
