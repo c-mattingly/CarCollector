@@ -1,8 +1,9 @@
 from django.shortcuts import redirect, render
-from .models import Car
+from .models import Car, Part
 from .forms import MaintenanceForm
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView
 
 # CBV(Class Based View) functions
 
@@ -40,8 +41,32 @@ def cars_index(request):
 
 def cars_detail(request, car_id):
     car = Car.objects.get(id=car_id)
+    parts_car_doesnt_have = Part.objects.exclude(id__in = car.parts.all().values_list('id'))
     maintenance_form = MaintenanceForm()
     return render(request, 'cars/detail.html', { 
         'car': car,
-        'maintenance_form': maintenance_form
+        'maintenance_form': maintenance_form, 
+        'parts': parts_car_doesnt_have
         })
+
+def assoc_part(request, car_id, part_id):
+    Car.objects.get(id=car_id).parts.add(part_id)
+    return redirect('detail', car_id=car_id)
+
+class PartList(ListView):
+    model = Part
+
+class PartDetail(DetailView):
+    model = Part
+
+class PartCreate(CreateView):
+    model = Part
+    fields = '__all__'
+
+class PartUpdate(UpdateView):
+    model = Part
+    fields = ['name', 'type']
+
+class PartDelete(DeleteView):
+    model = Part
+    success_url = '/parts/'
